@@ -85,3 +85,47 @@ JOIN film_category fc ON lr.film_id = fc.film_id
 JOIN category c ON fc.category_id = c.category_id
 GROUP BY c.category_id, c.name
 ORDER BY late_rentals DESC;
+
+-- Q5 — Auditoría: pagos sospechosos
+-- Lo que queremos lograr es obtener pagos mayores a 10 o pagos multiples del mismo cliente
+SELECT 
+    payment_id, 
+    customer_id, 
+    amount, 
+    payment_date,
+    CASE 
+        WHEN amount > 10 THEN 'Pago mayor $10'
+        ELSE 'Pago repetido'
+    END AS flag_reason
+FROM payment
+WHERE amount > 10 
+   OR (customer_id, amount, payment_date::date) IN (
+       SELECT customer_id, amount, payment_date::date
+       FROM payment 
+       GROUP BY customer_id, amount, payment_date::date 
+       HAVING COUNT(*) > 1
+   );
+
+-- Q6 — Clientes con riesgo (mora)
+-- Queremos identificar clientes con 5 o mas rentas tradias
+SELECT 
+    r.customer_id, 
+    COUNT(*) AS late_returns_count, 
+    MAX(r.return_date) AS last_late_return_date
+FROM rental r
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+WHERE r.return_date > r.rental_date + (f.rental_duration * INTERVAL '1 day')
+GROUP BY r.customer_id
+HAVING COUNT(*) >= 5;
+
+-- Q7 — Integridad: inventario con rentas activas duplicadas
+-- Lo que lograremos es que un mismo producto no aparezca rentado mas de una vez 
+SELECT 
+    inventory_id, 
+    COUNT(*) AS active_rentals_count, 
+    ARRAY_AGG(rental_id) AS rental_ids
+FROM rental
+WHERE return_date IS NULL
+GROUP BY inventory_id
+HAVING COUNT(*) > 1;
