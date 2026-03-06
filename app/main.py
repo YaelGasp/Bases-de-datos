@@ -87,3 +87,4 @@ def process_return(rental_id: int, db: Session = Depends(get_db)):
     except OperationalError:
         db.rollback()
         raise HTTPException(status_code=500, detail="Error de concurrencia al procesar la devolución")
+    
