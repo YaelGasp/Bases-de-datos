@@ -1,4 +1,12 @@
-from fastapi import FastAPI
+import time
+from datetime import datetime
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import OperationalError
+from pydantic import BaseModel
+from database import get_db
+from routers import payments
+import models
 
 app = FastAPI(title="DVD Rental API")
 
@@ -6,12 +14,6 @@ app = FastAPI(title="DVD Rental API")
 def root():
     return {"message": "DVD Rental API funcionando"}
 
-import time
-from datetime import datetime
-from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import OperationalError
-from pydantic import BaseModel
 
 # Importamos la configuración de la base de datos y los modelos del equipo
 from database import get_db
@@ -88,3 +90,4 @@ def process_return(rental_id: int, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail="Error de concurrencia al procesar la devolución")
     
+app.include_router(payments.enrutador)

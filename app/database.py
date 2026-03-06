@@ -17,7 +17,7 @@ motor = create_engine(url_conexion)
 SesionLocal = sessionmaker(bind=motor)
 Base = declarative_base()
 
-def obtener_db():
+def get_db():
     sesion = SesionLocal()
     try:
         yield sesion
