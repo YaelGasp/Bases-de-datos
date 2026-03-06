@@ -1,11 +1,6 @@
--- Archivo: sql/queries.sql
--- Propósito: Consultas avanzadas de la BD Pagila
-
--- -----------------------------------------------------------------------------
 -- Q1 — Top 10 clientes por gasto con ranking
--- Propósito: Obtener los 10 clientes que más han gastado históricamente, 
--- asignándoles una posición usando RANK().
--- -----------------------------------------------------------------------------
+-- Vamos a obtener los 10 clientes que más han gastado 
+-- y que posicion tienen en el ranking.
 WITH CustomerSpending AS (
     SELECT 
         c.customer_id, 
@@ -24,14 +19,10 @@ SELECT
     total_paid
 FROM CustomerSpending
 LIMIT 10;
--- Ejemplo salida: rank=1, customer_id=526, first_name=KARL, last_name=SEAL, total_paid=221.55
 
 
--- -----------------------------------------------------------------------------
 -- Q2 — Top 3 películas por tienda (por # de rentas)
--- Propósito: Descubrir cuáles son las 3 películas más populares en cada 
--- sucursal usando particiones (Window Functions).
--- -----------------------------------------------------------------------------
+-- Queremos descubrir cuáles son las 3 películas más rentadas en cada sucursal.
 WITH FilmRentals AS (
     SELECT 
         i.store_id, 
@@ -55,4 +46,3 @@ RankedRentals AS (
 SELECT store_id, film_id, title, rentals_count, rn
 FROM RankedRentals
 WHERE rn <= 3;
--- Ejemplo salida: store_id=1, film_id=103, title=BUCKET BROTHERHOOD, rentals_count=34, rn=1
