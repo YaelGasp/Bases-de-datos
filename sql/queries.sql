@@ -58,7 +58,7 @@ SELECT
     COUNT(i.inventory_id) AS available_inventory_count
 FROM inventory i
 LEFT JOIN ActiveRentals ar ON i.inventory_id = ar.inventory_id
-WHERE ar.inventory IS NULL 
+WHERE ar.inventory_id IS NULL 
 GROUP BY i.store_id;
 
 
